@@ -131,11 +131,11 @@ export default class {
   }
 
   handleShowTickets(e, bills, index) {
-    console.log(this.counter)
+
     if (this.counter === undefined || this.index !== index) this.counter = 0
     if (this.index === undefined || this.index !== index) this.index = index
     if ($(`#arrow-icon${this.index}`).hasClass("opened")) this.counter = 1
-    console.log(this.counter)
+
     if (this.counter % 2 === 0) {
       $(`#arrow-icon${this.index}`).addClass("opened")
       $(`#arrow-icon${this.index}`).css({ transform: 'rotate(0deg)' })

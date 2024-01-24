@@ -17,12 +17,14 @@ export default class NewBill {
   }
   handleChangeFile = e => {
     e.preventDefault()
+    console.log('File input change event:', e);
+    const fileTest = e.target.files[0];
+    console.log('Uploaded file:', fileTest);
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     const filePath = e.target.value.split(/\\/g)
     const fileName = filePath[filePath.length - 1]
     const extension = fileName.split(".")[1]
-    if (extension === ("jpg" || "jpeg" || "png")) {
-      console.log(extension)
+    if (["jpg", "jpeg", "png"].includes(extension)) {
       const formData = new FormData()
       const email = JSON.parse(localStorage.getItem("user")).email
       formData.append('file', file)
