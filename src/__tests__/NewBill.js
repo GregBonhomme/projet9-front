@@ -30,9 +30,10 @@ describe("Given I am connected as an employee", () => {
       const handleChangeFile = jest.fn(newBill.handleChangeFile)
       const uploadFile = jest.fn(newBill.store.bills().create)
       expenseFile.addEventListener('change', handleChangeFile)
-      const file = new File(['facturefreemobile'], 'facturefreemobile.jpg', { type: 'image/jpg' })
+      const file = new File(['facturefreemobile'], '../assets/images/facturefreemobile.jpg', { type: 'image/jpg' })
       userEvent.upload(expenseFile, file)
-      const extension = expenseFile.files[0].name.split(".")[1]
+      const fileName = expenseFile.files[0].name.split("/")[(expenseFile.files[0].name.split("/").length) - 1]
+      const extension = fileName.split(".")[1]
       console.log(`!!!!!!!!!!!! ${extension}`)
       if (["jpg", "jpeg", "png"].includes(extension)) { uploadFile() }
 
@@ -52,13 +53,14 @@ describe("Given I am connected as an employee", () => {
       await waitFor(() => screen.getByText('Envoyer une note de frais'))
       const newBill = new NewBill({ document, onNavigate, store: mockStore, localStorage })
       const formNewBill = screen.getByTestId('form-new-bill')
-      const handleSubmit = jest.fn(newBill.handleSubmit.bind(newBill))
+      const handleSubmit = jest.fn(newBill.handleSubmit)
       formNewBill.addEventListener('submit', handleSubmit)
       const submitBtn = formNewBill.querySelector('#btn-send-bill')
       userEvent.click(submitBtn)
       expect(handleSubmit).toHaveBeenCalled()
     })
-    /*test("Then selecting a file in the right format will upload it", async () => {
+
+    test("Then filling all inputs with correct info should upload the new bill", async () => {
       Object.defineProperty(window, 'localStorage', { value: localStorageMock })
       window.localStorage.setItem('user', JSON.stringify({
         type: 'Employee'
@@ -67,59 +69,49 @@ describe("Given I am connected as an employee", () => {
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname })
       }
-      const newBill = new NewBill({
-        document,
-        onNavigate,
-        store: {
-          bills: {
-            create: jest.fn().mockImplementation(() => Promise.resolve({ fileUrl: 'mockFileUrl', key: 'mockKey' })),
-            update: jest.fn().mockImplementation(() => Promise.resolve()),
-          },
-          localStorage,
-        }
-      })
+      await waitFor(() => screen.getByText('Envoyer une note de frais'))
+      const newBill = new NewBill({ document, onNavigate, store: mockStore, localStorage })
+      const handleSubmit = jest.fn(newBill.handleSubmit)
+      const expenseType = screen.getByTestId('expense-type')
+      userEvent.selectOptions(expenseType, 'Fournitures de bureau')
+      const expenseName = screen.getByTestId('expense-name')
+      userEvent.type(expenseName, "Test de nouvelle facture")
+      const expenseDate = screen.getByTestId('datepicker')
+      userEvent.clear(expenseDate)
+      userEvent.type(expenseDate, '01011991')
+      const expenseAmount = screen.getByTestId('amount')
+      userEvent.type(expenseAmount, "1234")
+      const expenseVat = screen.getByTestId('vat')
+      userEvent.type(expenseVat, "10")
+      const expensePct = screen.getByTestId('pct')
+      userEvent.type(expensePct, "5")
+      const expenseComment = screen.getByTestId('commentary')
+      userEvent.type(expenseComment, "azerty azerty azerty azerty")
       const expenseFile = screen.getByTestId('file')
-      const file = new File(['facturefreemobile'], 'facturefreemobile.jpg', { type: 'image/jpg' })
+      const file = new File(["facturefreemobile"], "facturefreemobile.jpg", { type: "image/jpg" })
       userEvent.upload(expenseFile, file)
-      await waitFor(() => {
-        expect(newBill.fileUrl).toBe('mockFileUrl');
-        expect(newBill.fileName).toBe('test.jpg');
-      })
+      const formNewBill = screen.getByTestId('form-new-bill')
+      const submitBtn = formNewBill.querySelector('#btn-send-bill')
+      const billsList = jest.fn(newBill.store.bills.list)
+      userEvent.click(submitBtn)
 
-    })*/
+      const updatedInfo = {
+        type: expenseType.value,
+        name: expenseName.value,
+        amount: expenseAmount.value,
+        date: expenseDate.value,
+        vat: expenseVat.value,
+        pct: expensePct.value,
+        commentary: expenseComment.value,
+        fileUrl: expenseFile.files[0].name,
+        fileName: expenseFile.files[0].name,
+        status: 'pending'
+      }
+
+    })
   })
 })
 
+/* 
 
-
-/*
-const expenseType = screen.getByTestId('expense-type')
-userEvent.selectOptions(expenseType, 'Fournitures de bureau')
-const expenseName = screen.getByTestId('expense-name')
-userEvent.type(expenseName, "Test de nouvelle facture")
-const expenseDate = screen.getByTestId('datepicker')
-expenseDate.value = "1999-01-02"
-const expenseAmount = screen.getByTestId('amount')
-userEvent.type(expenseAmount, "1234")
-const expenseVat = screen.getByTestId('vat')
-userEvent.type(expenseVat, "10")
-const expensePct = screen.getByTestId('pct')
-userEvent.type(expensePct, "5")
-const expenseComment = screen.getByTestId('commentary')
-userEvent.type(expenseComment, "azerty azerty azerty azerty")
-const expenseFile = screen.getByTestId('file')
-const file = new File(["facturefreemobile"], "facturefreemobile.jpg", { type: "image/jpg" })
-userEvent.upload(expenseFile, file)
-
-const updatedInfo = {
-  type: expenseType.value,
-  name: expenseName.value,
-  amount: expenseAmount.value,
-  date: expenseDate.value,
-  vat: expenseVat.value,
-  pct: expensePct.value,
-  commentary: expenseComment.value,
-  fileUrl: expenseFile.value,
-  fileName: expenseFile[(expenseFile.value.split(/\\/g)).length - 1],
-  status: 'pending'
 */

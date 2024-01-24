@@ -17,12 +17,11 @@ export default class NewBill {
   }
   handleChangeFile = e => {
     e.preventDefault()
-    console.log('File input change event:', e);
-    const fileTest = e.target.files[0];
-    console.log('Uploaded file:', fileTest);
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     const filePath = e.target.value.split(/\\/g)
-    const fileName = filePath[filePath.length - 1]
+    console.log(e.target.value)
+    const fileName = file.name
+    console.log(fileName)
     const extension = fileName.split(".")[1]
     if (["jpg", "jpeg", "png"].includes(extension)) {
       const formData = new FormData()
