@@ -19,9 +19,7 @@ export default class NewBill {
     e.preventDefault()
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     const filePath = e.target.value.split(/\\/g)
-    console.log(e.target.value)
     const fileName = file.name
-    console.log(fileName)
     const extension = fileName.split(".")[1]
     if (["jpg", "jpeg", "png"].includes(extension)) {
       const formData = new FormData()
@@ -49,7 +47,6 @@ export default class NewBill {
   }
   handleSubmit = e => {
     e.preventDefault()
-    console.log('e.target.querySelector(`input[data-testid="datepicker"]`).value', e.target.querySelector(`input[data-testid="datepicker"]`).value)
     const email = JSON.parse(localStorage.getItem("user")).email
     const bill = {
       email,

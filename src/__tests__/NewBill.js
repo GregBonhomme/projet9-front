@@ -9,6 +9,7 @@ import NewBill from "../containers/NewBill.js"
 import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
 import mockStore from "../__mocks__/store"
+import mockStoreError from "../__mocks__/storeError.js";
 import userEvent from "@testing-library/user-event"
 
 jest.mock("../app/store", () => mockStore)
@@ -37,6 +38,23 @@ describe("Given I am connected as an employee", () => {
 
       expect(handleChangeFile).toHaveBeenCalled()
       expect(uploadFile).toHaveBeenCalled()
+    })
+
+    test("Then if the file is not uploaded correctly an error will be logged", async () => {
+      document.body.innerHTML = NewBillUI()
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname })
+      }
+      await waitFor(() => screen.getByText('Envoyer une note de frais'))
+      jest.mock("../app/store", () => mockStoreError)
+      const newBill = new NewBill({ document, onNavigate, store: mockStoreError, localStorage })
+      const logSpy = jest.spyOn(console, 'error')
+      try {
+        newBill.handleChangeFile()
+      } catch (error) {
+        expect(logSpy.toHaveBeenCalled)
+      }
+      logSpy.mockRestore()
     })
 
     test("Then clicking the 'submit' button submit the new bill", async () => {

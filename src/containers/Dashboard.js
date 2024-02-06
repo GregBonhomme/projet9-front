@@ -155,9 +155,7 @@ export default class {
       if (!$(`#open-bill${bill.id}`).hasClass("active")) $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
       $(`#open-bill${bill.id}`).addClass("active")
     })
-
     return bills
-
   }
 
   getBillsAllUsers = () => {

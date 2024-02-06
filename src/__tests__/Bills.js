@@ -1,14 +1,15 @@
 /**
  * @jest-environment jsdom
  */
-
+import { expect } from "@jest/globals";
 import { fireEvent, screen, waitFor } from "@testing-library/dom"
-import BillsUI from "../views/BillsUI.js"
-import Bills from "../containers/Bills.js"
-import { bills } from "../fixtures/bills.js"
+import BillsUI from "../views/BillsUI.js";
+import Bills from "../containers/Bills.js";
+import { bills } from "../fixtures/bills.js";
 import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
-import mockStore from "../__mocks__/store"
+import mockStore from "../__mocks__/store.js";
+import mockStoreError from "../__mocks__/storeError.js";
 import router from "../app/Router.js";
 import userEvent from "@testing-library/user-event";
 
@@ -88,6 +89,25 @@ describe("Given I am connected as an Employee and i am on Bills page", () => {
       expect(handleClickNewBill).toHaveBeenCalled()
       const newBillModal = screen.getByTestId('form-new-bill')
       expect(newBillModal).toBeTruthy()
+    })
+  })
+  describe("When for some reason the data is corrupted", () => {
+    test("Then the error is logged", async () => {
+
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname })
+      }
+      jest.mock("../app/store", () => mockStoreError)
+      const billsList = new Bills({
+        document, onNavigate, store: mockStoreError, bills, localStorage: window.localStorage
+      })
+      const logSpy = jest.spyOn(console, 'error')
+      try {
+        await billsList.getBills()
+      } catch (error) {
+        expect(logSpy.toHaveBeenCalled)
+      }
+      logSpy.mockRestore()
     })
   })
 })
